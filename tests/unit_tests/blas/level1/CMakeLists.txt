@@ -18,10 +18,12 @@
 #===============================================================================
 
 # Build object from all test sources
-set(L1_SOURCES "nrm2.cpp" "iamin.cpp" "iamax.cpp" "dotu.cpp" "dot.cpp" "dotc.cpp" "copy.cpp" "axpy.cpp" "axpby.cpp" "asum.cpp" "swap.cpp" "sdsdot.cpp" "scal.cpp" "rotmg.cpp" "rotm.cpp" "rotg.cpp" "rot.cpp" "nrm2_usm.cpp" "iamin_usm.cpp" "iamax_usm.cpp" "dotu_usm.cpp" "dot_usm.cpp" "dotc_usm.cpp" "copy_usm.cpp" "axpy_usm.cpp" "axpby_usm.cpp" "asum_usm.cpp" "swap_usm.cpp" "sdsdot_usm.cpp" "scal_usm.cpp" "rotmg_usm.cpp" "rotm_usm.cpp" "rotg_usm.cpp" "rot_usm.cpp")
+set(L1_SOURCES_W_CBLAS "nrm2.cpp" "iamin.cpp" "iamax.cpp" "dotu.cpp" "dot.cpp" "dotc.cpp" "copy.cpp" "axpy.cpp" "axpby.cpp" "asum.cpp" "swap.cpp" "sdsdot.cpp" "scal.cpp" "rotmg.cpp" "rotm.cpp" "rotg.cpp" "rot.cpp" "nrm2_usm.cpp" "iamin_usm.cpp" "iamax_usm.cpp" "dotu_usm.cpp" "dot_usm.cpp" "dotc_usm.cpp" "copy_usm.cpp" "axpy_usm.cpp" "axpby_usm.cpp" "asum_usm.cpp" "swap_usm.cpp" "sdsdot_usm.cpp" "scal_usm.cpp" "rotmg_usm.cpp" "rotm_usm.cpp" "rotg_usm.cpp" "rot_usm.cpp")
+# TODO: add list of tests without Netlib dependency
+set(L1_SOURCES)
 
 if(BUILD_SHARED_LIBS)
-  add_library(blas_level1_rt OBJECT ${L1_SOURCES})
+  add_library(blas_level1_rt OBJECT $<$<BOOL:${CBLAS_FOUND}>:${L1_SOURCES_W_CBLAS}> ${L1_SOURCES})
   target_compile_options(blas_level1_rt PRIVATE -DCALL_RT_API -DNOMINMAX)
   target_include_directories(blas_level1_rt
       PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
@@ -29,16 +31,16 @@ if(BUILD_SHARED_LIBS)
       PUBLIC ${PROJECT_SOURCE_DIR}/include
       PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
       PUBLIC ${CMAKE_BINARY_DIR}/bin
-      PUBLIC ${CBLAS_INCLUDE}
+      $<$<BOOL:${CBLAS_FOUND}>:${CBLAS_INCLUDE}>
   )
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
-    add_sycl_to_target(TARGET blas_level1_rt SOURCES ${L1_SOURCES})
+    add_sycl_to_target(TARGET blas_level1_rt SOURCES $<$<BOOL:${CBLAS_FOUND}>:${L1_SOURCES_W_CBLAS}> ${L1_SOURCES})
   else()
     target_link_libraries(blas_level1_rt PUBLIC ONEMKL::SYCL::SYCL)
   endif()
 endif()
 
-add_library(blas_level1_ct OBJECT ${L1_SOURCES})
+add_library(blas_level1_ct OBJECT $<$<BOOL:${CBLAS_FOUND}>:${L1_SOURCES_W_CBLAS}> ${L1_SOURCES})
 target_compile_options(blas_level1_ct PRIVATE -DNOMINMAX)
 target_include_directories(blas_level1_ct
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
@@ -46,10 +48,10 @@ target_include_directories(blas_level1_ct
     PUBLIC ${PROJECT_SOURCE_DIR}/include
     PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
     PUBLIC ${CMAKE_BINARY_DIR}/bin
-    PUBLIC ${CBLAS_INCLUDE}
+    $<$<BOOL:${CBLAS_FOUND}>:${CBLAS_INCLUDE}>
 )
 if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
-  add_sycl_to_target(TARGET blas_level1_ct SOURCES ${L1_SOURCES})
+  add_sycl_to_target(TARGET blas_level1_ct SOURCES $<$<BOOL:${CBLAS_FOUND}>:${L1_SOURCES_W_CBLAS}> ${L1_SOURCES})
 else()
   target_link_libraries(blas_level1_ct PUBLIC ONEMKL::SYCL::SYCL)
 endif()

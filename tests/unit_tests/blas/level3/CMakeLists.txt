@@ -18,10 +18,12 @@
 #===============================================================================
 
 # Build object from all test sources
-set(L3_SOURCES "gemm.cpp" "symm.cpp" "syrk.cpp" "hemm.cpp" "herk.cpp" "syr2k.cpp" "her2k.cpp" "trmm.cpp" "trsm.cpp" "gemm_usm.cpp" "symm_usm.cpp" "syrk_usm.cpp" "hemm_usm.cpp" "herk_usm.cpp" "syr2k_usm.cpp" "her2k_usm.cpp" "trmm_usm.cpp" "trsm_usm.cpp")
+set(L3_SOURCES_W_CBLAS "gemm.cpp" "symm.cpp" "syrk.cpp" "hemm.cpp" "herk.cpp" "syr2k.cpp" "her2k.cpp" "trmm.cpp" "trsm.cpp" "gemm_usm.cpp" "symm_usm.cpp" "syrk_usm.cpp" "hemm_usm.cpp" "herk_usm.cpp" "syr2k_usm.cpp" "her2k_usm.cpp" "trmm_usm.cpp" "trsm_usm.cpp")
+# TODO: add list of tests without Netlib dependency
+set(L3_SOURCES)
 
 if(BUILD_SHARED_LIBS)
-  add_library(blas_level3_rt OBJECT ${L3_SOURCES})
+  add_library(blas_level3_rt OBJECT $<$<BOOL:${CBLAS_FOUND}>:${L3_SOURCES_W_CBLAS}> ${L3_SOURCES})
   target_compile_options(blas_level3_rt PRIVATE -DCALL_RT_API -DNOMINMAX)
   target_include_directories(blas_level3_rt
       PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
@@ -29,16 +31,16 @@ if(BUILD_SHARED_LIBS)
       PUBLIC ${PROJECT_SOURCE_DIR}/include
       PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
       PUBLIC ${CMAKE_BINARY_DIR}/bin
-      PUBLIC ${CBLAS_INCLUDE}
+      $<$<BOOL:${CBLAS_FOUND}>:${CBLAS_INCLUDE}>
   )
   if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
-    add_sycl_to_target(TARGET blas_level3_rt SOURCES ${L3_SOURCES})
+    add_sycl_to_target(TARGET blas_level3_rt SOURCES $<$<BOOL:${CBLAS_FOUND}>:${L3_SOURCES_W_CBLAS}> ${L3_SOURCES})
   else()
     target_link_libraries(blas_level3_rt PUBLIC ONEMKL::SYCL::SYCL)
   endif()
 endif()
 
-add_library(blas_level3_ct OBJECT ${L3_SOURCES})
+add_library(blas_level3_ct OBJECT $<$<BOOL:${CBLAS_FOUND}>:${L3_SOURCES_W_CBLAS}> ${L3_SOURCES})
 target_compile_options(blas_level3_ct PRIVATE  -DNOMINMAX)
 target_include_directories(blas_level3_ct
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include
@@ -46,10 +48,10 @@ target_include_directories(blas_level3_ct
     PUBLIC ${PROJECT_SOURCE_DIR}/include
     PUBLIC ${PROJECT_SOURCE_DIR}/deps/googletest/include
     PUBLIC ${CMAKE_BINARY_DIR}/bin
-    PUBLIC ${CBLAS_INCLUDE}
+    $<$<BOOL:${CBLAS_FOUND}>:${CBLAS_INCLUDE}>
 )
 if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
-  add_sycl_to_target(TARGET blas_level3_ct SOURCES ${L3_SOURCES})
+  add_sycl_to_target(TARGET blas_level3_ct SOURCES $<$<BOOL:${CBLAS_FOUND}>:${L3_SOURCES_W_CBLAS}> ${L3_SOURCES})
 else()
   target_link_libraries(blas_level3_ct PUBLIC ONEMKL::SYCL::SYCL)
 endif()
