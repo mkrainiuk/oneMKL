@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright 2021-2022 Intel Corporation
+* Copyright 2025 SiPearl
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,22 +19,20 @@
 
 #pragma once
 
-#include "oneapi/math/detail/config.hpp"
+#include <sycl/sycl.hpp>
 
-#ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
-#include "oneapi/math/lapack/detail/mklcpu/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_MKLGPU_BACKEND
-#include "oneapi/math/lapack/detail/mklgpu/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_CUSOLVER_BACKEND
-#include "oneapi/math/lapack/detail/cusolver/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_ROCSOLVER_BACKEND
-#include "oneapi/math/lapack/detail/rocsolver/lapack_ct.hpp"
-#endif
-#ifdef ONEMATH_ENABLE_ARMPL_BACKEND
-#include "oneapi/math/lapack/detail/armpl/lapack_ct.hpp"
-#endif
+#include <complex>
+#include <cstdint>
 
-#include "oneapi/math/lapack/detail/lapack_rt.hpp"
+#include "oneapi/math/types.hpp"
+namespace oneapi {
+namespace math {
+namespace lapack {
+namespace armpl {
+
+#include "onemath_lapack_armpl.hxx"
+
+} // namespace armpl
+} // namespace lapack
+} // namespace math
+} // namespace oneapi
