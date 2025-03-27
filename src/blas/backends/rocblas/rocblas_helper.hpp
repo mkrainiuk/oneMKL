@@ -218,7 +218,7 @@ inline rocblas_side get_rocblas_side_mode(oneapi::math::side lr) {
 
 template <typename T>
 inline rocblas_datatype get_rocblas_datatype() {
-    static_assert(false);
+    static_assert(sizeof(T) && false, "Type T has no corresponding rocBLAS type");
 }
 
 template <>

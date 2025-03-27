@@ -260,7 +260,7 @@ inline cublasSideMode_t get_cublas_side_mode(oneapi::math::side lr) {
 
 template <typename T>
 inline cudaDataType_t get_cublas_datatype() {
-    static_assert(false);
+    static_assert(sizeof(T) && false, "Type T has no corresponding cuBLAS type");
 }
 
 template <>
