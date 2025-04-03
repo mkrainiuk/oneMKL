@@ -81,13 +81,13 @@ jobs:
     - name: Install compiler
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ac92f2bb-4818-4e53-a432-f8b34d502f23/intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh
-        sudo bash intel-dpcpp-cpp-compiler-2025.0.0.740_offline.sh -s -a -s --action install --eula accept
+        wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/cd63be99-88b0-4981-bea1-2034fe17f5cf/intel-dpcpp-cpp-compiler-2025.1.0.573_offline.sh
+        sudo bash intel-dpcpp-cpp-compiler-2025.1.0.573_offline.sh -s -a -s --action install --eula accept
     - name: Install Intel oneMKL
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/79153e0f-74d7-45af-b8c2-258941adf58a/intel-onemkl-2025.0.0.940_offline.sh
-        sudo bash intel-onemkl-2025.0.0.940_offline.sh -s -a -s --action install --eula accept
+        wget --progress=dot:giga https://registrationcenter-download.intel.com/akdlm/IRC_NAS/dc93af13-2b3f-40c3-a41b-2bc05a707a80/intel-onemkl-2025.1.0.803_offline.sh
+        sudo bash intel-onemkl-2025.1.0.803_offline.sh -s -a -s --action install --eula accept
     - name: Configure/Build for a domain
       if: steps.domain_check.outputs.result == 'true'
       run: |
