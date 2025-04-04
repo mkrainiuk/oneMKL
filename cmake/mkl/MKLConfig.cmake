@@ -224,7 +224,8 @@ endif()
 
 # Determine Compiler Family
 if(CXX_COMPILER_NAME STREQUAL "dpcpp" OR CXX_COMPILER_NAME STREQUAL "dpcpp.exe"
-    OR CXX_COMPILER_NAME STREQUAL "icpx" OR CXX_COMPILER_NAME STREQUAL "icx.exe")
+    OR CXX_COMPILER_NAME STREQUAL "icpx" OR CXX_COMPILER_NAME STREQUAL "icx.exe"
+    OR CXX_COMPILER_NAME STREQUAL "mpiicpx" OR CXX_COMPILER_NAME STREQUAL "mpiicx.bat")
   set(SYCL_COMPILER ON)
 endif()
 if(C_COMPILER_NAME MATCHES "^clang" OR CXX_COMPILER_NAME MATCHES "^clang")
@@ -408,7 +409,7 @@ endif()
 
 # Define MKL_THREADING
 # All APIs support sequential threading
-# SYCL API supports oneTBB and OpenMP threadings, but OpenMP threading might have composability problem on CPU device with other SYCL kernels
+# SYCL API supports oneTBB and OpenMP threadings
 if(SYCL_COMPILER)
   set(MKL_SYCL_THREADING_LIST "sequential" "intel_thread" "tbb_thread")
   set(DEFAULT_MKL_SYCL_THREADING tbb_thread)
@@ -419,12 +420,6 @@ if(SYCL_COMPILER)
   if(NOT MKL_SYCL_THREADING)
     set(SYCL_COMPILER OFF)
     mkl_message(STATUS "MKL::MKL_SYCL target will not be available.")
-  endif()
-  if(MKL_SYCL_THREADING STREQUAL "intel_thread")
-    mkl_message(STATUS "Using MKL::MKL_SYCL* targets with intel_thread may have potential composability problems on CPU device with other SYCL kernels.")
-    add_custom_target(MKL_SYCL_MESSAGE
-                      COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red
-                      "Warning: Using MKL::MKL_SYCL* targets with intel_thread may have potential composability problems on CPU device with other SYCL kernels.")
   endif()
 endif()
 # C, Fortran API
@@ -509,12 +504,20 @@ if(SYCL_COMPILER)
   list(APPEND MKL_SYCL_COPT "-fsycl")
   list(APPEND MKL_SYCL_LOPT "-fsycl")
   if(MKL_SYCL_LINK STREQUAL "static")
-    list(APPEND MKL_SYCL_LOPT "-fsycl-device-code-split=per_kernel")
+    if(WIN32)
+      list(APPEND MKL_SYCL_LOPT "-fsycl-device-code-split:per_kernel")
+    else()
+      list(APPEND MKL_SYCL_LOPT "-fsycl-device-code-split=per_kernel")
+    endif()
   endif()
 endif()
 if(ENABLE_OMP_OFFLOAD)
   if(MKL_LINK STREQUAL "static")
-    list(APPEND MKL_OFFLOAD_LOPT "-fsycl-device-code-split=per_kernel")
+    if(WIN32)
+      list(APPEND MKL_OFFLOAD_LOPT "-fsycl-device-code-split:per_kernel")
+    else()
+      list(APPEND MKL_OFFLOAD_LOPT "-fsycl-device-code-split=per_kernel")
+    endif()
   endif()
 endif()
 
@@ -998,7 +1001,6 @@ if(SYCL_COMPILER)
   if(NOT TARGET MKL::MKL_SYCL)
     add_library(MKL::MKL_SYCL INTERFACE IMPORTED GLOBAL)
     add_library(MKL::MKL_DPCPP ALIAS MKL::MKL_SYCL)
-    add_dependencies(MKL::MKL_SYCL MKL_SYCL_MESSAGE)
   endif()
   target_compile_options(MKL::MKL_SYCL INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${MKL_SYCL_COPT}>)
   target_link_libraries(MKL::MKL_SYCL INTERFACE ${MKL_SYCL_LINK_LINE} ${MKL_SYCL_THREAD_LIB} ${MKL_SYCL_SUPP_LINK})
@@ -1011,7 +1013,6 @@ if(SYCL_COMPILER)
     endif()
     string(TOUPPER ${MKL_SYCL_DOMAIN} MKL_SYCL_DOMAIN)
     add_library(MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} INTERFACE IMPORTED GLOBAL)
-    add_dependencies(MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} MKL_SYCL_MESSAGE)
     target_compile_options(MKL::MKL_SYCL::${MKL_SYCL_DOMAIN} INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${MKL_SYCL_COPT}>)
     # Only dynamic link has domain specific libraries
     # Domain specific targets still use mkl_sycl for static
