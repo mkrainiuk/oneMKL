@@ -21,6 +21,7 @@
 #define _GENERIC_BLAS_COMMON_HPP_
 
 #include "onemath_sycl_blas.hpp"
+#include "oneapi/math/detail/config.hpp"
 #include "oneapi/math/types.hpp"
 #include "oneapi/math/exceptions.hpp"
 
@@ -40,9 +41,11 @@ using handle_t = ::blas::SB_Handle;
 template <typename ElemT>
 using buffer_iterator_t = ::blas::BufferIterator<ElemT>;
 
+#ifdef ONEMATH_GENERIC_BLAS_ENABLE_COMPLEX
 // sycl complex data type (experimental)
 template <typename ElemT>
 using sycl_complex_t = sycl::ext::oneapi::experimental::complex<ElemT>;
+#endif
 
 /** A trait for obtaining equivalent onemath_sycl_blas API types from oneMath API
  *  types.
@@ -68,8 +71,10 @@ DEF_GENERIC_BLAS_TYPE(oneapi::math::transpose, char)
 DEF_GENERIC_BLAS_TYPE(oneapi::math::uplo, char)
 DEF_GENERIC_BLAS_TYPE(oneapi::math::side, char)
 DEF_GENERIC_BLAS_TYPE(oneapi::math::diag, char)
+#ifdef ONEMATH_GENERIC_BLAS_ENABLE_COMPLEX
 DEF_GENERIC_BLAS_TYPE(std::complex<float>, sycl_complex_t<float>)
 DEF_GENERIC_BLAS_TYPE(std::complex<double>, sycl_complex_t<double>)
+#endif
 // Passthrough of onemath_sycl_blas arg types for more complex wrapping.
 DEF_GENERIC_BLAS_TYPE(::blas::gemm_batch_type_t, ::blas::gemm_batch_type_t)
 
@@ -85,6 +90,7 @@ struct generic_type<ElemT*> {
     using type = ElemT*;
 };
 
+#ifdef ONEMATH_GENERIC_BLAS_ENABLE_COMPLEX
 // USM Complex
 template <typename ElemT>
 struct generic_type<std::complex<ElemT>*> {
@@ -95,6 +101,7 @@ template <typename ElemT>
 struct generic_type<const std::complex<ElemT>*> {
     using type = const sycl_complex_t<ElemT>*;
 };
+#endif
 
 template <>
 struct generic_type<std::vector<sycl::event>> {
@@ -210,6 +217,10 @@ struct throw_if_unsupported_by_device {
         throw unimplemented("blas", "onemath_sycl_blas function");                              \
     }
 
+#ifndef ONEMATH_GENERIC_BLAS_ENABLE_USM
+#define CALL_GENERIC_BLAS_USM_FN(genericFunc, ...) \
+    throw unimplemented("blas", "onemath_sycl_blas USM API", "- unsupported compiler");
+#else
 #define CALL_GENERIC_BLAS_USM_FN(genericFunc, ...)                                \
     if constexpr (is_column_major()) {                                            \
         detail::throw_if_unsupported_by_device<double, sycl::aspect::fp64>{}(     \
@@ -230,6 +241,7 @@ struct throw_if_unsupported_by_device {
     else {                                                                        \
         throw unimplemented("blas", "onemath_sycl_blas function");                \
     }
+#endif
 
 } // namespace generic
 } // namespace blas

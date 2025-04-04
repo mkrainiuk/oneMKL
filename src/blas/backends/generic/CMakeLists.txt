@@ -141,7 +141,7 @@ endif()
 # If find_package doesn't work, download onemath_sycl_blas from Github. This is
 # intended to make oneMath easier to use.
 message(STATUS "Looking for oneMATH blas kernels")
-find_package(ONEMATH_SYCL_BLAS QUIET)
+find_package(ONEMATH_SYCL_BLAS 0.2.0 QUIET)
 if (NOT ONEMATH_SYCL_BLAS_FOUND)
   message(STATUS "Looking for onemath_sycl_blas for generic backend - could not find onemath_sycl_blas with ONEMATH_SYCL_BLAS_DIR")
   include(FetchContent)
@@ -150,7 +150,6 @@ if (NOT ONEMATH_SYCL_BLAS_FOUND)
   endif()
   # Following variable TUNING_TARGET will be used in generic blas internal configuration
   set(TUNING_TARGET ${GENERIC_BLAS_TUNING_TARGET})
-  set(BLAS_ENABLE_COMPLEX ON)
   # Set the policy to forward variables to generic blas configure step
   set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
   set(FETCHCONTENT_BASE_DIR "${CMAKE_BINARY_DIR}/deps")
@@ -161,12 +160,20 @@ if (NOT ONEMATH_SYCL_BLAS_FOUND)
     SOURCE_SUBDIR onemath/sycl/blas
   )
   FetchContent_MakeAvailable(onemath_sycl_blas)
+  install(
+    TARGETS onemath_sycl_blas
+    EXPORT oneMathTargets
+  )
   message(STATUS "Looking for onemath_sycl_blas - downloaded")
 
 else()
   message(STATUS "Looking for oneMath blas kernels - found")
   add_library(onemath_sycl_blas ALIAS ONEMATH_SYCL_BLAS::onemath_sycl_blas)
 endif()
+
+# Read cmake options exported by the onemath_sycl_blas project into oneMath variables
+set(ONEMATH_GENERIC_BLAS_ENABLE_COMPLEX ${BLAS_ENABLE_COMPLEX} CACHE INTERNAL "Enable complex data type support")
+set(ONEMATH_GENERIC_BLAS_ENABLE_USM ${BLAS_ENABLE_USM} CACHE INTERNAL "Enable USM API support")
 
 set(SOURCES
   generic_level1_double.cpp generic_level1_float.cpp

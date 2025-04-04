@@ -32,6 +32,10 @@ void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::tran
           sycl::buffer<std::complex<real_t>, 1>& a, std::int64_t lda,
           sycl::buffer<std::complex<real_t>, 1>& b, std::int64_t ldb, std::complex<real_t> beta,
           sycl::buffer<std::complex<real_t>, 1>& c, std::int64_t ldc) {
+#ifndef ONEMATH_GENERIC_BLAS_ENABLE_COMPLEX
+    throw unimplemented("blas", "onemath_sycl_blas gemm with complex data type",
+                        "- unsupported compiler");
+#else
     using sycl_complex_real_t = sycl::ext::oneapi::experimental::complex<real_t>;
     if (transa == oneapi::math::transpose::conjtrans ||
         transb == oneapi::math::transpose::conjtrans) {
@@ -62,6 +66,7 @@ void gemm(sycl::queue& queue, oneapi::math::transpose transa, oneapi::math::tran
     sycl::accessor<std::complex<real_t>, 1, sycl::access::mode::write> out_acc(c);
     sycl::accessor<sycl_complex_real_t, 1, sycl::access::mode::read> out_pb_acc(c_pb);
     queue.copy(out_pb_acc, out_acc);
+#endif
 }
 
 void symm(sycl::queue& queue, oneapi::math::side left_right, oneapi::math::uplo upper_lower,
