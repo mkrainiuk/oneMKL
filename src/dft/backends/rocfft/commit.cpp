@@ -34,6 +34,8 @@
 #include "oneapi/math/dft/detail/rocfft/onemath_dft_rocfft.hpp"
 #include "oneapi/math/dft/types.hpp"
 
+#include "execute_helper.hpp"
+#include "../../execute_helper_generic.hpp"
 #include "../stride_helper.hpp"
 
 #include "rocfft_handle.hpp"
@@ -557,9 +559,9 @@ public:
         this->get_queue().submit([&](sycl::handler& cgh) {
             auto workspace_acc =
                 buffer_workspace.template get_access<sycl::access::mode::read_write>(cgh);
-            cgh.host_task([=](sycl::interop_handle ih) {
+            dft::detail::fft_enqueue_task(cgh, [=](sycl::interop_handle ih) {
                 auto workspace_native = reinterpret_cast<scalar_type*>(
-                    ih.get_native_mem<sycl::backend::ext_oneapi_hip>(workspace_acc));
+                    ih.get_native_mem<sycl_hip_backend>(workspace_acc));
                 set_workspace_impl(handle, workspace_native, workspace_bytes, "set_workspace");
             });
         });

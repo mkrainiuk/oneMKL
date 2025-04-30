@@ -338,7 +338,7 @@ Supported compilers include:
         <tr>
             <td rowspan=2 align="center">NVIDIA GPU</td>
             <td align="center">NVIDIA cuFFT</td>
-            <td align="center">Open DPC++</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
@@ -349,7 +349,7 @@ Supported compilers include:
         <tr>
             <td rowspan=2 align="center">AMD GPU</td>
             <td align="center">AMD rocFFT</td>
-            <td align="center">Open DPC++</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>

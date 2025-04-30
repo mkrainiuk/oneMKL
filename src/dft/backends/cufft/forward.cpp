@@ -79,7 +79,7 @@ ONEMATH_EXPORT void compute_forward(descriptor_type& desc,
             auto stream = detail::setup_stream(func_name, ih, plan);
 
             auto inout_native = reinterpret_cast<fwd<descriptor_type>*>(
-                ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(inout_acc));
+                ih.get_native_mem<detail::sycl_cuda_backend>(inout_acc));
             detail::cufft_execute<detail::Direction::Forward, fwd<descriptor_type>>(
                 func_name, stream, plan, reinterpret_cast<void*>(inout_native + offsets[0]),
                 reinterpret_cast<void*>(inout_native + offsets[1]));
@@ -124,14 +124,14 @@ ONEMATH_EXPORT void compute_forward(descriptor_type& desc,
         dft::detail::fft_enqueue_task(cgh, [=](sycl::interop_handle ih) {
             auto stream = detail::setup_stream(func_name, ih, plan);
 
-            auto in_native = reinterpret_cast<void*>(
-                reinterpret_cast<fwd<descriptor_type>*>(
-                    ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(in_acc)) +
-                offsets[0]);
-            auto out_native = reinterpret_cast<void*>(
-                reinterpret_cast<bwd<descriptor_type>*>(
-                    ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(out_acc)) +
-                offsets[1]);
+            auto in_native =
+                reinterpret_cast<void*>(reinterpret_cast<fwd<descriptor_type>*>(
+                                            ih.get_native_mem<detail::sycl_cuda_backend>(in_acc)) +
+                                        offsets[0]);
+            auto out_native =
+                reinterpret_cast<void*>(reinterpret_cast<bwd<descriptor_type>*>(
+                                            ih.get_native_mem<detail::sycl_cuda_backend>(out_acc)) +
+                                        offsets[1]);
             detail::cufft_execute<detail::Direction::Forward, fwd<descriptor_type>>(
                 func_name, stream, plan, in_native, out_native);
         });

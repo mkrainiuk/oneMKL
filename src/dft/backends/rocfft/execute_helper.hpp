@@ -36,6 +36,12 @@
 
 namespace oneapi::math::dft::rocfft::detail {
 
+#if defined(__ADAPTIVECPP__) || defined(__HIPSYCL__)
+constexpr auto sycl_hip_backend{ sycl::backend::hip };
+#else // DPC++
+constexpr auto sycl_hip_backend{ sycl::backend::ext_oneapi_hip };
+#endif
+
 template <dft::precision prec, dft::domain dom>
 inline dft::detail::commit_impl<prec, dom>* checked_get_commit(
     dft::detail::descriptor<prec, dom>& desc) {
@@ -60,12 +66,12 @@ inline auto expect_config(DescT& desc, const char* message) {
 
 template <typename Acc>
 inline void* native_mem(sycl::interop_handle& ih, Acc& buf) {
-    return ih.get_native_mem<sycl::backend::ext_oneapi_hip>(buf);
+    return ih.get_native_mem<sycl_hip_backend>(buf);
 }
 
 inline hipStream_t setup_stream(const std::string& func, sycl::interop_handle& ih,
                                 rocfft_execution_info info) {
-    auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_hip>();
+    auto stream = ih.get_native_queue<sycl_hip_backend>();
     auto result = rocfft_execution_info_set_stream(info, stream);
     if (result != rocfft_status_success) {
         throw oneapi::math::exception(

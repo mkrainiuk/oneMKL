@@ -36,6 +36,12 @@
 
 namespace oneapi::math::dft::cufft::detail {
 
+#if defined(__ADAPTIVECPP__) || defined(__HIPSYCL__)
+constexpr auto sycl_cuda_backend{ sycl::backend::cuda };
+#else // DPC++
+constexpr auto sycl_cuda_backend{ sycl::backend::ext_oneapi_cuda };
+#endif
+
 template <dft::precision prec, dft::domain dom>
 inline dft::detail::commit_impl<prec, dom>* checked_get_commit(
     dft::detail::descriptor<prec, dom>& desc) {
@@ -142,7 +148,7 @@ void cufft_execute(const std::string& func, CUstream stream, cufftHandle plan, v
 }
 
 inline CUstream setup_stream(const std::string& func, sycl::interop_handle ih, cufftHandle plan) {
-    auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
+    auto stream = ih.get_native_queue<sycl_cuda_backend>();
     auto result = cufftSetStream(plan, stream);
     if (result != CUFFT_SUCCESS) {
         throw oneapi::math::exception("dft/backends/cufft", func,

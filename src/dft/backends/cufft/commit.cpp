@@ -34,6 +34,8 @@
 #include "oneapi/math/dft/detail/cufft/onemath_dft_cufft.hpp"
 #include "oneapi/math/dft/types.hpp"
 
+#include "execute_helper.hpp"
+#include "../../execute_helper_generic.hpp"
 #include "../stride_helper.hpp"
 
 #include <cufft.h>
@@ -84,7 +86,7 @@ public:
         if (fix_context) {
             // cufftDestroy changes the context so change it back.
             CUdevice interopDevice =
-                sycl::get_native<sycl::backend::ext_oneapi_cuda>(this->get_queue().get_device());
+                sycl::get_native<sycl_cuda_backend>(this->get_queue().get_device());
             CUcontext interopContext;
             if (cuDevicePrimaryCtxRetain(&interopContext, interopDevice) != CUDA_SUCCESS) {
                 throw math::exception("dft/backends/cufft", __FUNCTION__,
@@ -353,8 +355,8 @@ public:
             .submit([&](sycl::handler& cgh) {
                 auto workspace_acc =
                     buffer_workspace.template get_access<sycl::access::mode::read_write>(cgh);
-                cgh.host_task([=](sycl::interop_handle ih) {
-                    auto stream = ih.get_native_queue<sycl::backend::ext_oneapi_cuda>();
+                dft::detail::fft_enqueue_task(cgh, [=](sycl::interop_handle ih) {
+                    auto stream = ih.get_native_queue<sycl_cuda_backend>();
                     auto result = cufftSetStream(plan, stream);
                     if (result != CUFFT_SUCCESS) {
                         throw oneapi::math::exception(
@@ -362,7 +364,7 @@ public:
                             "cufftSetStream returned " + std::to_string(result));
                     }
                     auto workspace_native = reinterpret_cast<scalar_type*>(
-                        ih.get_native_mem<sycl::backend::ext_oneapi_cuda>(workspace_acc));
+                        ih.get_native_mem<sycl_cuda_backend>(workspace_acc));
                     cufftSetWorkArea(plan, workspace_native);
                 });
             })

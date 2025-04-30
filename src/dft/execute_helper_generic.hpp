@@ -39,7 +39,11 @@ namespace oneapi::math::dft::detail {
  */
 template <typename HandlerT, typename FnT>
 static inline void fft_enqueue_task(HandlerT&& cgh, FnT&& f) {
-#ifdef SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND
+#if defined(__ADAPTIVECPP__)
+    cgh.AdaptiveCpp_enqueue_custom_operation([=](sycl::interop_handle ih) {
+#elif defined(__HIPSYCL__)
+    cgh.hipSYCL_enqueue_custom_operation([=](sycl::interop_handle ih) {
+#elif defined(SYCL_EXT_ONEAPI_ENQUEUE_NATIVE_COMMAND)
     cgh.ext_codeplay_enqueue_native_command([=](sycl::interop_handle ih) {
 #else
     cgh.host_task([=](sycl::interop_handle ih) {
