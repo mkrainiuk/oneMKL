@@ -627,6 +627,8 @@ You can also join the mailing lists for the [UXL Foundation](https://lists.uxlfo
 
 You can contribute to this project and also contribute to [the specification for this project](https://oneapi-spec.uxlfoundation.org/specifications/oneapi/latest/elements/onemath/source/). Please read the [CONTRIBUTING](CONTRIBUTING.md) page for more information. You can also contact oneMath developers and maintainers via [UXL Foundation Slack](https://slack-invite.uxlfoundation.org/) using [#onemath](https://uxlfoundation.slack.com/archives/onemath) channel.
 
+You can find the oneMath release schedule and works already in progress towards future milestones in GitHub's [Milestones](https://github.com/uxlfoundation/oneMath/milestones) section. If you are looking for a specific task to start, consider selecting from issues that are marked with the [help wanted](https://github.com/uxlfoundation/oneMath/labels/help%20wanted) label.
+
 ---
 
 ## License
