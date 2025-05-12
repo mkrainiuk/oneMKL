@@ -21,7 +21,22 @@
 set(LIB_NAME onemath_rng_armpl)
 set(LIB_OBJ ${LIB_NAME}_obj)
 
-find_package(ARMPL REQUIRED)
+option(ENABLE_ARMPL_OPENRNG "Use the open-source OpenRNG library for ARMPL RNG backend" OFF)
+
+if (ENABLE_ARMPL_OPENRNG)
+  find_package(OpenRNG REQUIRED)
+else()
+  find_package(ARMPL)
+  if (NOT ARMPL_FOUND)
+    message(STATUS "ARMPL not found, trying OpenRNG instead")
+    set(ENABLE_ARMPL_OPENRNG ON CACHE BOOL "Use the open-source OpenRNG library for ARMPL RNG backend" FORCE)
+    find_package(OpenRNG)
+  endif()
+endif()
+
+if (NOT ARMPL_FOUND AND NOT OpenRNG_FOUND)
+  message(FATAL_ERROR "Could NOT find ARMPL or OpenRNG")
+endif()
 
 set(SOURCES armpl_common.hpp
   philox4x32x10.cpp
@@ -45,7 +60,7 @@ if (USE_ADD_SYCL_TO_TARGET_INTEGRATION)
   add_sycl_to_target(TARGET ${LIB_OBJ} SOURCES ${SOURCES})
 endif()
 
-target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL ${ARMPL_LINK})
+target_link_libraries(${LIB_OBJ} PUBLIC ONEMATH::SYCL::SYCL $<IF:$<BOOL:${ENABLE_ARMPL_OPENRNG}>,ONEMATH::OpenRNG::OpenRNG,${ARMPL_LINK}>)
 
 set_target_properties(${LIB_OBJ} PROPERTIES
   POSITION_INDEPENDENT_CODE ON

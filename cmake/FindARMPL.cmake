@@ -32,50 +32,52 @@ else()
 endif()
 find_package_handle_standard_args(ARMPL REQUIRED_VARS ARMPL_LIBRARY)
 
-get_filename_component(ARMPL_LIB_DIR ${ARMPL_LIBRARY} DIRECTORY)
-find_path(ARMPL_INCLUDE armpl.h HINTS ${ARMPL_ROOT} $ENV{ARMPLROOT} PATH_SUFFIXES include)
-#cmake replaces fullpath to libarmpl by -larmpl (because SONAME is absent) and -Wl,-rpath is not enough for some compilers as hint
-#so we need to add -L to compiler, otherwise we need to set LIBRARY_PATH manually when building
-if(UNIX)
-  list(APPEND ARMPL_LINK "-Wl,-rpath,${ARMPL_LIB_DIR} -L${ARMPL_LIB_DIR}")
-endif()
-list(APPEND ARMPL_LINK ${ARMPL_LIBRARY})
-list(APPEND ARMPL_LINK ${ARMPL_LIBRARY})
-message(${ARMPL_LINK})
-find_package_handle_standard_args(ARMPL REQUIRED_VARS ARMPL_INCLUDE ARMPL_LINK)
+if (ARMPL_FOUND AND NOT TARGET ONEMKL::ARMPL::ARMPL)
+  get_filename_component(ARMPL_LIB_DIR ${ARMPL_LIBRARY} DIRECTORY)
+  find_path(ARMPL_INCLUDE armpl.h HINTS ${ARMPL_ROOT} $ENV{ARMPLROOT} PATH_SUFFIXES include)
+  #cmake replaces fullpath to libarmpl by -larmpl (because SONAME is absent) and -Wl,-rpath is not enough for some compilers as hint
+  #so we need to add -L to compiler, otherwise we need to set LIBRARY_PATH manually when building
+  if(UNIX)
+    list(APPEND ARMPL_LINK "-Wl$<COMMA>-rpath$<COMMA>${ARMPL_LIB_DIR} -L${ARMPL_LIB_DIR}")
+  endif()
+  list(APPEND ARMPL_LINK ${ARMPL_LIBRARY})
+  list(APPEND ARMPL_LINK ${ARMPL_LIBRARY})
+  message(${ARMPL_LINK})
+  find_package_handle_standard_args(ARMPL REQUIRED_VARS ARMPL_INCLUDE ARMPL_LINK)
 
-# Check ARMPL version (only versions higher or equal to 22.0.1 are supported)
-set(ARMPL_MAJOR 22)
-set(ARMPL_MINOR 0)
-set(ARMPL_BUILD 1)
-file(WRITE ${CMAKE_BINARY_DIR}/armplversion.cpp
-"#include <stdio.h>\n"
-"\n"
-"#include \"armpl.h\"\n"
-"\n"
-"int main(void) {\n"
-"  int major, minor, build;\n"
-"  char *tag;\n"
-"  armplversion(&major, &minor, &build, (const char **)&tag);\n"
-"  if (major > MAJOR) {\n"
-"    return 0;\n"
-"  }\n"
-"  else if (major == MAJOR && minor > MINOR) {\n"
-"    return 0;\n"
-"  }\n"
-"  else if (major == MAJOR && minor == MINOR && build >= BUILD) {\n"
-"    return 0;\n"
-"  }\n"
-"  printf(\"You are using version %d.%d.%d\\n\", major, minor, build);\n"
-"  return 1;\n"
-"}\n")
-execute_process(COMMAND ${CMAKE_CXX_COMPILER} armplversion.cpp -O0 -I${ARMPL_INCLUDE} -Wl,-rpath,${ARMPL_LIB_DIR} -larmpl -DMAJOR=${ARMPL_MAJOR} -DMINOR=${ARMPL_MINOR} -DBUILD=${ARMPL_BUILD} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-execute_process(COMMAND ./a.out WORKING_DIRECTORY ${CMAKE_BINARY_DIR} RESULT_VARIABLE ARMPL_CHECK_VERSION)
-execute_process(COMMAND rm ./a.out WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-execute_process(COMMAND rm armplversion.cpp WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-if(ARMPL_CHECK_VERSION)
-  message(FATAL_ERROR "ARMPL backend does not support ARMPL version prior to version ${ARMPL_MAJOR}.${ARMPL_MINOR}.${ARMPL_BUILD}")
-endif()
+  # Check ARMPL version (only versions higher or equal to 22.0.1 are supported)
+  set(ARMPL_MAJOR 22)
+  set(ARMPL_MINOR 0)
+  set(ARMPL_BUILD 1)
+  file(WRITE ${CMAKE_BINARY_DIR}/armplversion.cpp
+  "#include <stdio.h>\n"
+  "\n"
+  "#include \"armpl.h\"\n"
+  "\n"
+  "int main(void) {\n"
+  "  int major, minor, build;\n"
+  "  char *tag;\n"
+  "  armplversion(&major, &minor, &build, (const char **)&tag);\n"
+  "  if (major > MAJOR) {\n"
+  "    return 0;\n"
+  "  }\n"
+  "  else if (major == MAJOR && minor > MINOR) {\n"
+  "    return 0;\n"
+  "  }\n"
+  "  else if (major == MAJOR && minor == MINOR && build >= BUILD) {\n"
+  "    return 0;\n"
+  "  }\n"
+  "  printf(\"You are using version %d.%d.%d\\n\", major, minor, build);\n"
+  "  return 1;\n"
+  "}\n")
+  execute_process(COMMAND ${CMAKE_CXX_COMPILER} armplversion.cpp -O0 -I${ARMPL_INCLUDE} -Wl,-rpath,${ARMPL_LIB_DIR} -larmpl -DMAJOR=${ARMPL_MAJOR} -DMINOR=${ARMPL_MINOR} -DBUILD=${ARMPL_BUILD} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  execute_process(COMMAND ./a.out WORKING_DIRECTORY ${CMAKE_BINARY_DIR} RESULT_VARIABLE ARMPL_CHECK_VERSION)
+  execute_process(COMMAND rm ./a.out WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  execute_process(COMMAND rm armplversion.cpp WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+  if(ARMPL_CHECK_VERSION)
+    message(FATAL_ERROR "ARMPL backend does not support ARMPL version prior to version ${ARMPL_MAJOR}.${ARMPL_MINOR}.${ARMPL_BUILD}")
+  endif()
 
-add_library(ONEMKL::ARMPL::ARMPL UNKNOWN IMPORTED)
-set_target_properties(ONEMKL::ARMPL::ARMPL PROPERTIES IMPORTED_LOCATION ${ARMPL_LIBRARY})
+  add_library(ONEMKL::ARMPL::ARMPL UNKNOWN IMPORTED)
+  set_target_properties(ONEMKL::ARMPL::ARMPL PROPERTIES IMPORTED_LOCATION ${ARMPL_LIBRARY})
+endif()

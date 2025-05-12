@@ -21,8 +21,8 @@ oneMath is part of the [UXL Foundation](http://www.uxlfoundation.org).
     </thead>
     <tbody>
         <tr>
-            <td rowspan=15 align="center">oneMath</td>
-            <td rowspan=15 align="center">oneMath selector</td>
+            <td rowspan=16 align="center">oneMath</td>
+            <td rowspan=16 align="center">oneMath selector</td>
             <td align="center"><a href="https://software.intel.com/en-us/oneapi/onemkl">Intel(R) oneAPI Math Kernel Library (oneMKL)</a></td>
             <td align="center">x86 CPU, Intel GPU</td>
         </tr>
@@ -54,6 +54,10 @@ oneMath is part of the [UXL Foundation](http://www.uxlfoundation.org).
         <tr>
             <td align="center"><a href="https://www.arm.com/products/development-tools/server-and-hpc/allinea-studio/performance-libraries">Arm Performance Libraries</a></td>
             <td align="center">aarch64 CPU</td>
+        </tr>
+        <tr>
+            <td align="center"><a href="https://gitlab.arm.com/libraries/openrng">Arm OpenRNG</a></td>
+            <td align="center">x86 and aarch64 CPU</td>
         </tr>
         <tr>
             <td align="center"><a href="https://rocblas.readthedocs.io/en/rocm-4.5.2/"> AMD rocBLAS</a></td>
@@ -285,15 +289,25 @@ Supported compilers include:
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td rowspan=5 align="center">RNG</td>
-            <td align="center">x86 CPU</td>
+            <td rowspan=7 align="center">RNG</td>
+            <td rowspan=2 align="center">x86 CPU</td>
             <td align="center">Intel(R) oneMKL</td>
             <td align="center">Intel DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
         <tr>
-            <td align="center">aarch64 CPU</td>
+            <td align="center">Arm OpenRNG</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
+            <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td rowspan=2 align="center">aarch64 CPU</td>
             <td align="center">Arm Performance Libraries</td>
+            <td align="center">Open DPC++</br>AdaptiveCpp</td>
+            <td align="center">Dynamic, Static</td>
+        </tr>
+        <tr>
+            <td align="center">Arm OpenRNG</td>
             <td align="center">Open DPC++</br>AdaptiveCpp</td>
             <td align="center">Dynamic, Static</td>
         </tr>
