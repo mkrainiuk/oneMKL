@@ -20,20 +20,20 @@
 #ifndef _ONEMATH_TYPES_HPP_
 #define _ONEMATH_TYPES_HPP_
 
-#ifdef __HIPSYCL__
-#include "oneapi/math/bfloat16.hpp"
-#endif
-
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
 #include <CL/sycl.hpp>
 #endif
 
+#ifndef SYCL_IMPLEMENTATION_INTEL
+#include "oneapi/math/bfloat16.hpp"
+#endif
+
 namespace oneapi {
 namespace math {
 
-#ifndef __HIPSYCL__
+#ifdef SYCL_IMPLEMENTATION_INTEL
 using bfloat16 = sycl::ext::oneapi::bfloat16;
 #endif
 
