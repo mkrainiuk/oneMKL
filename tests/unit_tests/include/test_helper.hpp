@@ -73,6 +73,14 @@
     if (d->get_info<sycl::info::device::double_fp_config>().size() == 0) \
     GTEST_SKIP() << "Double precision is not supported on the device"
 
+#ifdef SYCL_EXT_ONEAPI_GRAPH
+#define CHECK_GRAPH_ON_DEVICE(d)                   \
+    if (!d->has(aspect::ext_oneapi_limited_graph)) \
+    GTEST_SKIP() << "SYCL-Graph is not supported on the device"
+#else
+#define CHECK_GRAPH_ON_DEVICE(d) GTEST_SKIP() << "SYCL-Graph is not supported on the device"
+#endif
+
 #if defined(ONEMATH_ENABLE_MKLCPU_BACKEND) || defined(ONEMATH_ENABLE_NETLIB_BACKEND) || \
     defined(ONEMATH_ENABLE_ARMPL_BACKEND)
 #ifdef ONEMATH_ENABLE_MKLCPU_BACKEND
