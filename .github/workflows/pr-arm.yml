@@ -11,8 +11,7 @@ on:
 env:
   CTEST_OUTPUT_ON_FAILURE: 1
   LAPACK_VERSION: 3.12.0
-  ARMPL_VERSION: 25.04.1
-  DPCPP_VERSION: nightly-2025-04-01
+  DPCPP_VERSION: 6.1.0
 
 jobs:
   unit-tests:
@@ -67,36 +66,36 @@ jobs:
     - name: Build DPC++
       if: steps.domain_check.outputs.result == 'true' && steps.cache-dpcpp.outputs.cache-hit != 'true'
       run: |
-        wget --progress=dot:giga -P dpcpp https://github.com/intel/llvm/archive/refs/tags/${{ env.DPCPP_VERSION }}.tar.gz
+        wget --progress=dot:giga -P dpcpp https://github.com/intel/llvm/archive/refs/tags/v${{ env.DPCPP_VERSION }}.tar.gz
         cd dpcpp
-        tar -xzf ${{ env.DPCPP_VERSION }}.tar.gz
+        tar -xzf v${{ env.DPCPP_VERSION }}.tar.gz
         python llvm-${{ env.DPCPP_VERSION }}/buildbot/configure.py -o build -t Release --cmake-gen Ninja --native_cpu --cmake-opt="-DSYCL_ENABLE_BACKENDS=native_cpu" --cmake-opt="-DCMAKE_INSTALL_PREFIX=$PWD/install" --llvm-external-projects=openmp
         cd build
         ninja deploy-sycl-toolchain omp install
     - name: Install ArmPL
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        mkdir armpl
-        cd armpl
-        wget --progress=dot:giga https://developer.arm.com/-/cdn-downloads/permalink/Arm-Performance-Libraries/Version_${{ env.ARMPL_VERSION }}/arm-performance-libraries_${{ env.ARMPL_VERSION }}_deb_gcc.tar
-        tar -xf arm-performance-libraries_${{ env.ARMPL_VERSION }}_deb_gcc.tar
-        ./arm-performance-libraries_${{ env.ARMPL_VERSION }}_deb/arm-performance-libraries_${{ env.ARMPL_VERSION }}_deb.sh -a -i $PWD/install
+        . /etc/os-release
+        curl "https://developer.arm.com/packages/arm-toolchains:${NAME,,}-${VERSION_ID/%.*/}/${VERSION_CODENAME}/Release.key" | sudo tee /etc/apt/trusted.gpg.d/developer-arm-com.asc
+        echo "deb https://developer.arm.com/packages/arm-toolchains:${NAME,,}-${VERSION_ID/%.*/}/${VERSION_CODENAME}/ ./" | sudo tee /etc/apt/sources.list.d/developer-arm-com.list
+        sudo apt update
+        sudo apt install -y arm-performance-libraries
     - name: Configure/Build for a domain
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        export PATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/bin:${PWD}/dpcpp/install/bin:${PATH}
-        export CPATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/include:${PWD}/dpcpp/install/include:${CPATH}
-        export LIBRARY_PATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LIBRARY_PATH}
-        export LD_LIBRARY_PATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LD_LIBRARY_PATH}
+        export PATH=/opt/arm/arm-performance-libraries/bin:${PWD}/dpcpp/install/bin:${PATH}
+        export CPATH=/opt/arm/arm-performance-libraries/include:${PWD}/dpcpp/install/include:${CPATH}
+        export LIBRARY_PATH=/opt/arm/arm-performance-libraries/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LIBRARY_PATH}
+        export LD_LIBRARY_PATH=/opt/arm/arm-performance-libraries/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LD_LIBRARY_PATH}
         sycl-ls
-        cmake -DTARGET_DOMAINS=${{ matrix.domain }} -DENABLE_MKLCPU_BACKEND=off -DENABLE_MKLGPU_BACKEND=off -DENABLE_ARMPL_BACKEND=on -DARMPL_ROOT=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc -DCMAKE_CXX_FLAGS='-fopenmp' -DCMAKE_VERBOSE_MAKEFILE=on ${{ matrix.build_options }} -B build -G Ninja
+        cmake -DTARGET_DOMAINS=${{ matrix.domain }} -DENABLE_MKLCPU_BACKEND=off -DENABLE_MKLGPU_BACKEND=off -DENABLE_ARMPL_BACKEND=on -DARMPL_ROOT=/opt/arm/arm-performance-libraries -DCMAKE_CXX_FLAGS='-fopenmp' -DCMAKE_VERBOSE_MAKEFILE=on ${{ matrix.build_options }} -B build -G Ninja
         cmake --build build
     - name: Run tests
       if: steps.domain_check.outputs.result == 'true'
       run: |
-        export PATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/bin:${PWD}/dpcpp/install/bin:${PATH}
-        export CPATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/include:${PWD}/dpcpp/install/include:${CPATH}
-        export LIBRARY_PATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LIBRARY_PATH}
-        export LD_LIBRARY_PATH=${PWD}/armpl/install/armpl_${{ env.ARMPL_VERSION }}_gcc/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LD_LIBRARY_PATH}
+        export PATH=/opt/arm/arm-performance-libraries/bin:${PWD}/dpcpp/install/bin:${PATH}
+        export CPATH=/opt/arm/arm-performance-libraries/include:${PWD}/dpcpp/install/include:${CPATH}
+        export LIBRARY_PATH=/opt/arm/arm-performance-libraries/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LIBRARY_PATH}
+        export LD_LIBRARY_PATH=/opt/arm/arm-performance-libraries/lib:${PWD}/dpcpp/install/lib:${PWD}/dpcpp/install/lib/aarch64-unknown-linux-gnu:${LD_LIBRARY_PATH}
         sycl-ls
         ctest --test-dir build ${{ matrix.test_options }}
