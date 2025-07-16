@@ -30,11 +30,10 @@
 #include <CL/sycl.hpp>
 #endif
 #include "oneapi/math/types.hpp"
-#ifndef __HIPSYCL__
+#ifndef __ADAPTIVECPP__
 #include "cublas_scope_handle.hpp"
 #else
-#include "cublas_scope_handle_hipsycl.hpp"
-
+#include "cublas_scope_handle_adaptivecpp.hpp"
 namespace sycl {
 using interop_handler = sycl::interop_handle;
 }
@@ -44,10 +43,10 @@ namespace math {
 namespace blas {
 namespace cublas {
 
-#ifdef __HIPSYCL__
+#ifdef __ADAPTIVECPP__
 template <typename H, typename F>
 static inline void host_task_internal(H& cgh, F f) {
-    cgh.hipSYCL_enqueue_custom_operation([f](sycl::interop_handle ih) {
+    cgh.AdaptiveCpp_enqueue_custom_operation([f](sycl::interop_handle ih) {
         auto sc = CublasScopedContextHandler(ih);
         f(sc);
     });

@@ -82,7 +82,7 @@ private:
 } // anonymous namespace
 
 void print_error_code(sycl::exception const& e) {
-#ifdef __HIPSYCL__
+#ifdef __ADAPTIVECPP__
     std::cout << "Backend status: " << e.code() << std::endl;
 #else
     std::cout << "OpenCL status: " << e.code() << std::endl;
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
 
     auto platforms = sycl::platform::get_platforms();
     for (auto plat : platforms) {
-#ifdef __HIPSYCL__
+#ifdef __ADAPTIVECPP__
         if (!plat.is_host()) {
 #endif
             auto plat_devs = plat.get_devices();
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
                             continue;
 #endif
                         // clang-format off
-#ifdef __HIPSYCL__
+#ifdef __ADAPTIVECPP__
                         if (dev.is_accelerator())
 #else
                         if (!dev.is_accelerator())
@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
                     std::cout << "Exception while accessing device: " << e.what() << "\n";
                 }
             }
-#ifdef __HIPSYCL__
+#ifdef __ADAPTIVECPP__
         }
 #endif
     }

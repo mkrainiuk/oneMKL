@@ -16,8 +16,8 @@
 *  limitations under the License.
 *
 **************************************************************************/
-#ifndef CUBLAS_SCOPED_HANDLE_HIPSYCL_HPP
-#define CUBLAS_SCOPED_HANDLE_HIPSYCL_HPP
+#ifndef CUBLAS_SCOPED_HANDLE_ADAPTIVECPP_HPP
+#define CUBLAS_SCOPED_HANDLE_ADAPTIVECPP_HPP
 #if __has_include(<sycl/sycl.hpp>)
 #include <sycl/sycl.hpp>
 #else
@@ -79,4 +79,4 @@ public:
 } // namespace blas
 } // namespace math
 } // namespace oneapi
-#endif //CUBLAS_SCOPED_HANDLE_HIPSYCL_HPP
+#endif //CUBLAS_SCOPED_HANDLE_ADAPTIVECPP_HPP

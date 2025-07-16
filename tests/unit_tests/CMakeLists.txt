@@ -54,8 +54,11 @@ set(blas_TEST_LIST
         blas_level2
         blas_level3
         blas_batch
-        blas_extensions
-        blas_sycl_graph)
+        blas_extensions)
+
+if(${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "dpc++")
+  list(APPEND blas_TEST_LIST blas_sycl_graph)
+endif()
 
 set(blas_TEST_LINK "")
 
@@ -111,7 +114,7 @@ foreach(domain ${TEST_TARGET_DOMAINS})
   if(BUILD_SHARED_LIBS)
     add_executable(test_main_${domain}_rt main_test.cpp)
     target_include_directories(test_main_${domain}_rt PUBLIC ${GTEST_INCLUDE_DIR})
-    if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
+    if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
       target_compile_options(test_main_${domain}_rt PRIVATE -fsycl)
     endif()
     target_link_libraries(test_main_${domain}_rt PUBLIC
@@ -229,7 +232,7 @@ foreach(domain ${TEST_TARGET_DOMAINS})
       ${${domain}_DEVICE_TEST_LIST_CT}
   )
   
-  if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
+  if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
     target_link_options(test_main_${domain}_ct PUBLIC -fsycl-device-code-split=per_kernel)
   endif()
 

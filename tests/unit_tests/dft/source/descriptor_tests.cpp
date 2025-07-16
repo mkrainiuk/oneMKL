@@ -573,7 +573,7 @@ inline void recommit_values(sycl::queue& sycl_queue) {
 template <oneapi::math::dft::precision precision, oneapi::math::dft::domain domain>
 inline void change_queue_causes_wait([[maybe_unused]] sycl::queue& busy_queue) {
 // Skip this test in AdaptiveCpp, which doesn't support host_task
-#if !defined(__ADAPTIVECPP__) && !defined(__HIPSYCL__)
+#ifndef __ADAPTIVECPP__
     // create a queue with work on it, and then show that work is waited on when the descriptor
     // is committed to a new queue.
     // its possible to have a false positive result, but a false negative should not be possible.

@@ -56,7 +56,7 @@ void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int
           sycl::buffer<sycl::half, 1>& b, int64_t ldb, sycl::half beta,
           sycl::buffer<sycl::half, 1>& c, int64_t ldc) {
     queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -79,7 +79,7 @@ void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int
 void gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t m, int64_t n, int64_t k,
           float alpha, sycl::buffer<sycl::half, 1>& a, int64_t lda, sycl::buffer<sycl::half, 1>& b,
           int64_t ldb, float beta, sycl::buffer<float, 1>& c, int64_t ldc) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
     if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
         throw oneapi::math::unimplemented(
             "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -420,7 +420,7 @@ sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t
                  int64_t ldb, sycl::half beta, sycl::half* c, int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -445,7 +445,7 @@ sycl::event gemm(sycl::queue& queue, transpose transa, transpose transb, int64_t
                  int64_t ldb, float beta, float* c, int64_t ldc,
                  const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");

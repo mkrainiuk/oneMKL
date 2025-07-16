@@ -79,10 +79,10 @@ protected:
         }
         res = a_ - res * beta_;
         if constexpr (std::is_same<Method, exponential_method::icdf_accurate>::value) {
-#ifndef __HIPSYCL__
+#ifndef __ADAPTIVECPP__
             res = sycl::fmax(res, a_);
 #else
-            // a workaround for hipSYCL (AdaptiveCpp)
+            // a workaround for AdaptiveCpp
             if constexpr (EngineType::vec_size == 1) {
                 res = std::fmax(res, a_);
             }
@@ -102,10 +102,10 @@ protected:
         res = ln_wrapper(res);
         res = a_ - res * beta_;
         if constexpr (std::is_same<Method, exponential_method::icdf_accurate>::value) {
-#ifndef __HIPSYCL__
+#ifndef __ADAPTIVECPP__
             res = sycl::fmax(res, a_);
 #else
-            // a workaround for hipSYCL (AdaptiveCpp)
+            // a workaround for AdaptiveCpp
             if constexpr (EngineType::vec_size == 1) {
                 res = std::fmax(res, a_);
             }

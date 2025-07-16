@@ -26,7 +26,7 @@ set(SOURCES cublas_level1.cpp
                 cublas_batch.cpp
                 cublas_extensions.cpp
                 $<$<STREQUAL:${ONEMATH_SYCL_IMPLEMENTATION},dpc++>:cublas_scope_handle.cpp >
-                $<$<STREQUAL:${ONEMATH_SYCL_IMPLEMENTATION},hipsycl>:cublas_scope_handle_hipsycl.cpp >
+                $<$<STREQUAL:${ONEMATH_SYCL_IMPLEMENTATION},adaptivecpp>:cublas_scope_handle_adaptivecpp.cpp >
                 $<$<BOOL:${BUILD_SHARED_LIBS}>: cublas_wrappers.cpp>)
 add_library(${LIB_NAME})
 add_deprecated_library(${LIB_NAME})
@@ -41,7 +41,7 @@ target_include_directories(${LIB_OBJ}
 )
 target_compile_options(${LIB_OBJ} PRIVATE ${ONEMATH_BUILD_COPT})
 
-if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
+if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
     target_compile_options(ONEMATH::SYCL::SYCL INTERFACE
           -fsycl-targets=nvptx64-nvidia-cuda -fsycl-unnamed-lambda)
     target_link_options(ONEMATH::SYCL::SYCL INTERFACE

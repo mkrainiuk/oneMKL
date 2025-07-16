@@ -36,7 +36,7 @@
 
 namespace oneapi::math::dft::cufft::detail {
 
-#if defined(__ADAPTIVECPP__) || defined(__HIPSYCL__)
+#ifdef __ADAPTIVECPP__
 constexpr auto sycl_cuda_backend{ sycl::backend::cuda };
 #else // DPC++
 constexpr auto sycl_cuda_backend{ sycl::backend::ext_oneapi_cuda };

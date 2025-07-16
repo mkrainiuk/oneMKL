@@ -63,7 +63,7 @@ endif()
 
 target_link_libraries(${EXAMPLE_TARGET} PUBLIC ONEMATH::SYCL::SYCL)
 
-if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
+if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
   # set strict warning flags for rng device API examples
   target_compile_options(${EXAMPLE_TARGET} PUBLIC -Wall -Werror -Wextra -Wpedantic -Wunreachable-code -Wfloat-conversion -Wextra-semi -Wshadow)
   target_link_options(${EXAMPLE_TARGET} PUBLIC -fsycl -fsycl-device-code-split=per_kernel)

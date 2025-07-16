@@ -216,11 +216,11 @@ protected:
         else {
             res = engine.generate(a_, b_);
             if constexpr (std::is_same<Method, uniform_method::accurate>::value) {
-#ifndef __HIPSYCL__
+#ifndef __ADAPTIVECPP__
                 res = sycl::fmax(res, a_);
                 res = sycl::fmin(res, b_);
 #else
-                // a workaround for hipSYCL (AdaptiveCpp)
+                // a workaround for AdaptiveCpp
                 if constexpr (EngineType::vec_size == 1) {
                     res = sycl::fmax(res, a_);
                     res = sycl::fmin(res, b_);
@@ -294,11 +294,11 @@ protected:
         else {
             res = engine.generate_single(a_, b_);
             if constexpr (std::is_same<Method, uniform_method::accurate>::value) {
-#ifndef __HIPSYCL__
+#ifndef __ADAPTIVECPP__
                 res = sycl::fmax(res, a_);
                 res = sycl::fmin(res, b_);
 #else
-                // a workaround for hipSYCL (AdaptiveCpp)
+                // a workaround for AdaptiveCpp
                 if constexpr (EngineType::vec_size == 1) {
                     res = sycl::fmax(res, a_);
                     res = sycl::fmin(res, b_);

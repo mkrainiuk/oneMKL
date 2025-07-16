@@ -303,7 +303,7 @@ void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t 
                 sycl::half beta, sycl::buffer<sycl::half, 1>& c, int64_t ldc, int64_t stride_c,
                 int64_t batch_size) {
     queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -388,7 +388,7 @@ void gemm_batch(sycl::queue& queue, transpose transa, transpose transb, int64_t 
                 float beta, sycl::buffer<float, 1>& c, int64_t ldc, int64_t stride_c,
                 int64_t batch_size) {
     queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -1199,7 +1199,7 @@ sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
                        sycl::half** c, int64_t* ldc, int64_t group_count, int64_t* group_size,
                        const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -1294,7 +1294,7 @@ sycl::event gemm_batch(sycl::queue& queue, transpose* transa, transpose* transb,
                        int64_t group_count, int64_t* group_size,
                        const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -1469,7 +1469,7 @@ sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, i
                        sycl::half beta, sycl::half* c, int64_t ldc, int64_t stride_c,
                        int64_t batch_size, const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");
@@ -1556,7 +1556,7 @@ sycl::event gemm_batch(sycl::queue& queue, transpose transa, transpose transb, i
                        int64_t ldc, int64_t stride_c, int64_t batch_size,
                        const std::vector<sycl::event>& dependencies) {
     auto done = queue.submit([&](sycl::handler& cgh) {
-#ifndef __HIPSYCL__ //hip reports aspect as not supported even if it works
+#ifndef __ADAPTIVECPP__ // AdaptiveCpp reports aspect as not supported even if it works
         if (!verify_support<sycl::half, sycl::half>(queue, sycl::aspect::fp16)) {
             throw oneapi::math::unimplemented(
                 "blas", "sycl::half", "half is not supported by the device or the sycl compiler");

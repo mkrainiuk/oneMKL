@@ -35,6 +35,6 @@ else()
   target_link_libraries(rng_device_moments_ct PUBLIC ONEMATH::SYCL::SYCL)
 endif()
 
-if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "hipsycl")
+if(NOT ${ONEMATH_SYCL_IMPLEMENTATION} STREQUAL "adaptivecpp")
   target_link_options(rng_device_moments_ct PUBLIC -fsycl -fsycl-device-code-split=per_kernel)
 endif()
