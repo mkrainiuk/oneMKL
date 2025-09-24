@@ -19,12 +19,12 @@
 
 set(TEST_TARGET_DOMAINS ${TARGET_DOMAINS})
 
-if("blas" IN_LIST TEST_TARGET_DOMAINS)
+if(("blas" IN_LIST TEST_TARGET_DOMAINS) OR ("lapack" IN_LIST TEST_TARGET_DOMAINS))
   find_package(CBLAS)
   if(NOT CBLAS_FOUND)
     # TODO: add list of tests without Netlib dependency
-    message(WARNING "Netlib CBLAS headers or libraries are not found, BLAS unit tests will be skipped")
-    list(REMOVE_ITEM TEST_TARGET_DOMAINS "blas")
+    message(WARNING "Netlib CBLAS headers or libraries are not found, BLAS/LAPACK unit tests will be skipped")
+    list(REMOVE_ITEM TEST_TARGET_DOMAINS "blas" "lapack")
   endif()
 endif()
 
@@ -67,7 +67,7 @@ set(lapack_TEST_LIST
         lapack_source)
 
 if(LAPACKE_FOUND)
-  set(lapack_TEST_LINK ${LAPACKE_LINK})
+  set(lapack_TEST_LINK "")
 endif()
 
 # RNG config
@@ -245,6 +245,8 @@ foreach(domain ${TEST_TARGET_DOMAINS})
 
   if(domain STREQUAL "blas" AND CBLAS_FOUND)
     set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:${CBLAS_LIB_DIR}:$ENV{LD_LIBRARY_PATH})
+  elseif(domain STREQUAL "lapack" AND LAPACKE_FOUND)
+    set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:${LAPACKE64_LIB_DIR}:${CBLAS_LIB_DIR}:$ENV{LD_LIBRARY_PATH})
   else()
     set(TEST_LD_LIBRARY_PATH ${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH})
   endif()
